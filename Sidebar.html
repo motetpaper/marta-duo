@@ -4,7 +4,7 @@
 // job:   container for client-side Markdown table export process
 // git:   https://github.com/motetpaper/marta-duo
 // lic:   MIT https://opensource.org/license/mit
-// ver:   v0.3
+// ver:   v0.5
 // 
 -->
 <html>
@@ -30,10 +30,10 @@
   function marta(obj) {
     const sheet = obj;
     const now = Date.now();
-    const outfile = sheet.name+'-'+now+'.markdown.txt';
+    const outfile = `${sheet.name}-${now}.markdown.txt`;
     let thetable = sheet.dvals.map((a)=>{
       return a.map((str)=>{
-        return '| ' + str + ' ';
+        return `| ${str} `;
       });
     });
 
@@ -70,8 +70,9 @@
     a.download = outfile;
     a.click();
 
-    // function ..
-    
+    // helper functions
+    //
+    //    
 
     // returns column alignment in markdown syntax
     function getAlignmentMarkdown(str) {
@@ -93,7 +94,7 @@
     // returns alignment in markdown syntax
     function getAlignRow(str) {
       const align = getAlignmentMarkdown(str);
-      return '| ' + align + ' ';
+      return `| ${align} `;
     }    
   }
   </script>
