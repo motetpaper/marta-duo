@@ -2,7 +2,7 @@
 // job    : creates google sheets add-on for exporting markdown table text file
 // git:   https://github.com/motetpaper/marta-duo
 // lic:   MIT https://opensource.org/license/mit
-// ver:   v0.3
+// ver:   v0.5
 //
 
 function onOpen() {
