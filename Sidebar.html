@@ -12,8 +12,16 @@
     <base target="_top">
   </head>
   <body>
-
+  <style>
+    textarea {
+      width: 250px;
+      height: 500px;
+      font-size: 8pt;
+      font-family: monospace;      
+    }
+  </style>
   <h1>Thank you for using MOTET PAPER.</h1>
+  <textarea id="outbox"></textarea>
   <script defer type="text/javascript">
 
 
@@ -27,12 +35,51 @@
       marta(data);
     }).mkmarta();
   }
+
   function marta(obj) {
     const sheet = obj;
     const now = Date.now();
     const outfile = `${sheet.name}-${now}.markdown.txt`;
-    let thetable = sheet.dvals.map((a)=>{
-      return a.map((str)=>{
+    let thetable = sheet.dvals.map((a,j)=>{
+      return a.map((str,i)=>{
+
+        if(isMonospace(sheet.ffams[j][i])) {
+          str = `\`${str}\``;
+        }
+
+        if(sheet.ts_italic[j][i]) {
+          str = `*${str}*`;
+        }
+
+        if(sheet.ts_bold[j][i]) {
+          str = `**${str}**`;
+        }
+
+        /**
+         * NOTE: The strikethrough syntax for
+         * for markdown varies by platform.
+         * Support for more platforms may require
+         * more detailed documentation.
+         */
+
+        if(sheet.ts_strikethrough[j][i]) {
+          str = `~~${str}~~`;
+        }
+
+        if(sheet.ts_underline[j][i]) {
+          str = `<ins>${str}</ins>`;
+        }
+
+        // adds line breaks for each cell
+        // experimental feature, may be removed for performance
+        if(!!str.match(/\n/)) {
+          if(!!str.match(/`/)) {
+            str = str.replace(/\n/g, '`<br/>`');
+          } else {
+            str = str.replace(/\n/g, '<br/>');            
+          }
+        }
+
         return `| ${str} `;
       });
     });
@@ -60,7 +107,14 @@
     thetable.splice(1,0,alignRow);
 
     
-    const outdata = thetable.map((a)=>a.join('')+'|').join('\\n')+'\\n'
+    const outdata = thetable.map((a)=>a.join('')+'|').join('\n')+'\n'
+    
+    const obox = document.querySelector('#outbox');
+    obox.value = outdata;
+    obox.onfocus = function(evt) {
+      evt.target.select();
+    }
+
     const blob = new Blob([outdata], {
       type: 'text/plain'
     });
@@ -95,9 +149,64 @@
     function getAlignRow(str) {
       const align = getAlignmentMarkdown(str);
       return `| ${align} `;
-    }    
+    }
+
+    // uses fonts list found on fonts.google.com
+    // returns true if font family is monospaced; otherwise, false.
+    function isMonospace(str) {
+      return `
+      roboto mono
+      inconsolata
+      source code pro
+      ibm plex mono
+      nanum gothic coding
+      jetbrains mono
+      space mono
+      vt323
+      courier prime
+      dm mono
+      ubuntu mono
+      pt mono
+      doto
+      geist mono
+      fira mono
+      cousine
+      share tech mono
+      fira code
+      anonymous pro
+      overpass mono
+      sixtyfour convergence
+      major mono display
+      cutive mono
+      oxygen mono
+      azeret mono
+      b612 mono
+      nova mono
+      syne mono
+      reddit mono
+      lekton
+      xanh mono
+      martian mono
+      fragment mono
+      chivo mono
+      monofett
+      red hat mono
+      lxgw wenkai mono tc
+      kode mono
+      ubuntu sans mono
+      m plus 1 code
+      spline sans mono
+      sono
+      sometype mono
+      sixtyfour
+      workbench
+      victor mono
+      `.trim()
+      .split('\n')
+      .map((a)=>a.trim())
+      .indexOf(str.toLowerCase()) > -1;
+    }
   }
-  </script>
-    
+  </script> 
   </body>
 </html>
