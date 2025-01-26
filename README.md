@@ -1,4 +1,4 @@
-# marta-duo exports Markdown tables from Google sheets
+# marta-duo is an editor add-on that exports Markdown tables from Google sheets
 
 There are two files:
   * `Code.gs`: provides the server-side logic, building a Marta object
