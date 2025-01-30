@@ -4,31 +4,29 @@
 // job:   container for client-side Markdown table export process
 // git:   https://github.com/motetpaper/marta-duo
 // lic:   MIT https://opensource.org/license/mit
-// ver:   v0.5
 // 
 -->
 <html>
   <head>
-    <base target="_top">
+    <base target="_blank">
+    <!-- google addon look and feel -->
+    <link rel="stylesheet" 
+      href="https://ssl.gstatic.com/docs/script/css/add-ons.css">       
   </head>
   <body>
-  <style>
-    textarea {
-      width: 250px;
-      height: 500px;
-      font-size: 8pt;
-      font-family: monospace;      
-    }
-  </style>
-  <h1>Thank you for using MOTET PAPER.</h1>
-  <textarea id="outbox"></textarea>
+  <h1>Preview.</h1>
+  <button id="copybtn">Copy to clipboard</button>
+  <button id="exportbtn">Download</button>  
+  <textarea id="outdata"></textarea>
+  <button id="closebtn">Close</button>
+  <div id="footer">MOTET PAPER</div>
+
   <script defer type="text/javascript">
 
-
   document.body.onload = () => {
-    google.script.run.withFailureHandler((error) => {
+    google.script.run.withFailureHandler((err) => {
       console.error("error")
-      console.error(error.message)
+      console.error(err.message)
     }).withSuccessHandler((data) => {
       console.log("done!");
       console.log(data);
@@ -109,20 +107,12 @@
     
     const outdata = thetable.map((a)=>a.join('')+'|').join('\n')+'\n'
     
-    const obox = document.querySelector('#outbox');
+    const obox = document.querySelector('#outdata');
     obox.value = outdata;
     obox.onfocus = function(evt) {
       evt.target.select();
     }
 
-    const blob = new Blob([outdata], {
-      type: 'text/plain'
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = outfile;
-    a.click();
 
     // helper functions
     //
@@ -208,5 +198,65 @@
     }
   }
   </script> 
+  <script defer language="javascript">
+
+    const outputs = document.querySelector('#outdata');
+    const btns = document.querySelectorAll('button');
+    btns.forEach((b)=>{
+      b.addEventListener('click', (evt)=>{
+        switch(evt.target.id) {
+          case 'exportbtn':
+            let outdata = outputs.value;
+            const blob = new Blob([outdata], {
+              type: 'text/plain'
+            });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'marta.markdown.txt';
+            a.click();
+            break;
+          case 'closebtn':
+            google.script.host.close();
+            break;
+          case 'copybtn':
+            navigator.clipboard
+              .writeText(outputs.value)
+              .then(() => {
+                evt.target.innerText = 'Copied!';
+                setTimeout(()=>{
+                  evt.target.innerText = 'Copy to clipboard';
+                }, 1000);
+              });          
+            break;
+          default:
+            // nothing
+            break;
+        } // end switch
+      });
+    });
+
+  </script>
+  <style>
+    textarea {
+      width: 250px;
+      height: 250px;
+      font-size: 8pt;
+      font-family: monospace;      
+    }
+
+    #footer {
+      text-align: left;
+      background-color: white;
+      line-height: 150%;
+      font-size: 8pt;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      padding: 8px;
+      width: 95%;
+      border-top: 2px solid black;
+    }    
+  </style>
   </body>
 </html>
