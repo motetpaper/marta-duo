@@ -2,13 +2,12 @@
 // job    : creates google sheets add-on for exporting markdown table text file
 // git:   https://github.com/motetpaper/marta-duo
 // lic:   MIT https://opensource.org/license/mit
-// ver:   v0.5
 //
 
 function onOpen() {
   SpreadsheetApp.getUi()
-    .createMenu('Download as Markdown text file')
-    .addItem('Download the active range ...', 'exportMarkdownTable')
+    .createMenu('marta-duo')
+    .addItem('Export entire sheet as Markdown table ...', 'exportMarkdownTable')
     .addToUi();
 }
 
@@ -29,7 +28,7 @@ function mkmarta() {
 
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sht = ss.getActiveSheet();
-  const rng = sht.getDataRange();
+  const rng = sht.getDataRange(); // entire sheet
   const rows = rng.getNumRows();
   const cols = rng.getNumColumns();
  
