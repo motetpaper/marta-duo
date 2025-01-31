@@ -25,10 +25,10 @@
 
   document.body.onload = () => {
     google.script.run.withFailureHandler((err) => {
-      console.error("error")
+      console.error("[Sidebar.html] error")
       console.error(err.message)
     }).withSuccessHandler((data) => {
-      console.log("done!");
+      console.log("[Sidebar.html] done!");
       console.log(data);
       marta(data);
     }).mkmarta();
@@ -36,6 +36,8 @@
 
   function marta(obj) {
     const sheet = obj;
+    console.log('marta-prefs');
+    console.log(obj.prefs);
     const now = Date.now();
     const outfile = `${sheet.name}-${now}.markdown.txt`;
     let thetable = sheet.dvals.map((a,j)=>{
@@ -82,7 +84,7 @@
       });
     });
 
-    console.table(thetable)
+//    console.table(thetable)
 
     // removes the hidden rows
     thetable = thetable.map((a,i)=> {
