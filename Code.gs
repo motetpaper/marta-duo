@@ -4,41 +4,83 @@
 // lic:   MIT https://opensource.org/license/mit
 //
 
-function onOpen() {
-  SpreadsheetApp.getUi()
-    .createMenu('marta-duo')
-    .addItem('Export entire sheet as Markdown table ...', 'exportMarkdownTable')
-    .addToUi();
-}
-
 function onInstall() {
   onOpen();
 }
 
+// adds menu
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu('marta-duo')
+    .addItem('Export selection as Markdown table ...', 'exportRange')
+    .addItem('Export entire sheet as Markdown table ...', 'exportSheet')
+    .addToUi();
+}
+
+// settings area
+// NOTE: setings must be strings for CacheService; literals cause issues
+
+// exports the active selection to a markdown table
+function exportRange() {
+  const settings = {
+    active: 'true',
+    title: 'Exporting selection ...'
+  };
+
+  CacheService.getUserCache().putAll(settings, 300);
+  exportMarkdownTable();
+}
+
+// exports the entire sheet to a markdown table
+function exportSheet() {
+  const settings = {
+    active: 'false',
+    title: 'Exporting entire sheet ...'
+  };
+
+  CacheService.getUserCache().putAll(settings, 100);
+  exportMarkdownTable();
+}
+
+// exports the markdown table, from the sidebar
 function exportMarkdownTable() {
+  const prefs = getPrefs();
   SpreadsheetApp.getUi()
     .showSidebar(HtmlService
     .createHtmlOutputFromFile('Sidebar')
-    .setTitle('Exporting Markdown table ...'));
+    .setTitle(prefs.title));
 }
 
+// returns the export preferences from cache
+function getPrefs() {
+  const prefs = CacheService.getUserCache().getAll( [ 'active' , 'title' ]);
+  return prefs;
+}
+
+// makes a Marta object
 function mkmarta() {
 
   const obj = {};
 
+  // Markdown table export preferences
+  const prefs = getPrefs();
+  obj.prefs = prefs;
+
+  console.info(prefs);
+
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sht = ss.getActiveSheet();
-  const rng = sht.getDataRange(); // entire sheet
+  const rng = !!prefs.active ? sht.getActiveRange() : sht.getDataRange();
   const rows = rng.getNumRows();
   const cols = rng.getNumColumns();
- 
+
+
   // sheet data area
   obj.name = sht.getSheetName();
   obj.notation = rng.getA1Notation();
 
   obj.rows = rows;
   obj.cols = cols;
-
 
   obj.lastcol = rng.getLastColumn();
   obj.lastrow = rng.getLastRow();
